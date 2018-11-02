@@ -12,5 +12,11 @@ else()
 set(CMAKE_CXX_STANDAND 17)
 endif(MSVC)
 
+set(ENGINE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/engine CACHE STRING "engin dir")
+
 # 包含子项目。
-add_subdirectory ("openGL")
+add_subdirectory ("engine/src")
+
+add_subdirectory ("test")
+
+
