@@ -3,17 +3,18 @@
 precision mediump float
 #endif
 
-uniform float myvalue;
+vec3 c1=vec3(0.1,0.2,0.3);
+vec3 c2=vec3(0.2,0.3,0.4);
 
-vec3 c1=vec3(0.1,0.2,0.8);
-vec3 c2=vec3(1.0,0.5,0.2);
+in vec3 outColor;
+in vec2 outTexture;
 out vec4 FragColor;
+uniform sampler2D ourTexture;
 
 void main(){
     
     vec3 color=vec3(0.0);
-    float pct=abs(sin(myvalue));
-    color=mix(c1,c2,pct);
+    color=mix(c1,c2,0.5);
 
-    FragColor=vec4(color,1.0);
+    FragColor = texture(ourTexture, outTexture)*vec4(color,1.0);
 }
