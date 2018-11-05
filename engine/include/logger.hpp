@@ -8,12 +8,16 @@
 namespace ym {
 template<typename T>
 inline void log(T t) {
+#ifdef YM_DEBUG
     std::cout << t << std::endl;
+#endif // YM_DEBUG
 }
 template<typename T, typename ...Args>
 inline void log(T t, Args... args) {
+#ifdef YM_DEBUG
     std::cout << t << " ";
     ym::log(args...);
+#endif // YM_DEBUG
 }
 }
 #endif // !YM_LOGGER_HPP

@@ -24,7 +24,7 @@ public:
     }
     template<typename T>
     void set(const char* name, T&& value) {
-        if constexpr  (std::is_same_v<T, bool>) {
+        if constexpr (std::is_same_v<T, bool>) {
             glUniform1i(glGetUniformLocation(Id, name), value);
         } else if constexpr (std::is_same_v<T, int>) {
             glUniform1i(glGetUniformLocation(Id, name), value);
@@ -33,7 +33,7 @@ public:
         }else if constexpr (std::is_same_v<T, unsigned int>) {
             glUniform1ui(glGetUniformLocation(Id, name), value);
         }
-        log(POS, value);
+        ym::log(POS, value);
     }
 private:
     uint32_t compile(std::string_view source, int flag);
