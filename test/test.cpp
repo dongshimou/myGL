@@ -1,6 +1,4 @@
-﻿// main.cpp: 定义应用程序的入口点。
-//
-
+﻿
 #include "glad/glad.h"
 #include "glfw/glfw3.h"
 
@@ -8,55 +6,29 @@
 #include "shader.hpp"
 #include "texture.hpp"
 
+#include "window.hpp"
 
 #include "stb_image.h"
 
 #include<iostream>
 #include<array>
+
 using namespace std;
 
 
 int main() {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
 
-    auto window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
-    if (window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height) {
-        glViewport(0, 0, width, height);
-    });
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
-    }
+    try {
+        auto window = new ym::window("learn openGL", 800, 600);
 
-
-    uint32_t vao, vbo, ebo;
-
-
-    auto init_texture = [&]() {
-        try {
+        uint32_t vao, vbo, ebo;
+        auto init_texture = [&]() {
             auto texture = std::make_unique<ym::texture>(ym::texture(
                 "res/container.jpg"));
             return texture;
-        } catch (std::string err_str) {
-            ym::log(POS, err_str);
-        }
-    };
-    auto texture = init_texture();
-
-    auto init_shader = [&]() {
-        try {
+        };
+        auto texture = init_texture();
+        auto init_shader = [&]() {
             auto shader = std::make_unique<ym::shader>(ym::shader(
                 "res/shader.vert",
                 "res/shader.frag"));
@@ -99,46 +71,37 @@ int main() {
             //2
             glVertexAttribPointer(
                 2, 2, GL_FLOAT, GL_FALSE,
-                8 * sizeof(float),(void*)(6 * sizeof(float))
+                8 * sizeof(float), (void*)(6 * sizeof(float))
             );
             glEnableVertexAttribArray(2);
 
             return shader;
-        } catch (const std::string& str) {
-            ym::log(POS, str);
+        };
+        auto shader = init_shader();
+
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        while (!window->closed()) {
+            [&]() {
+                window->clear();
+                texture->use();
+
+                shader->use();
+
+                glBindVertexArray(vao);
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+            }();
+
+
+            window->update();
         }
-    };
+        glDeleteVertexArrays(1, &vao);
+        glDeleteBuffers(1, &vbo);
+        glDeleteBuffers(1, &ebo);
 
-    auto shader = init_shader();
-
-
-    while (!glfwWindowShouldClose(window)) {
-        [](GLFWwindow* w) {
-            if (glfwGetKey(w, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-                glfwSetWindowShouldClose(w, true);
-        }(window);
-
-        [&]() {
-            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            texture->use();
-
-            shader->use();
-
-            glBindVertexArray(vao);
-            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        }();
-
-
-        glfwPollEvents();
-        glfwSwapBuffers(window);
+        glfwTerminate();
+    } catch (std::string err_str) {
+        ym::log(err_str);
     }
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
-
-    glfwTerminate();
     return 0;
 }
